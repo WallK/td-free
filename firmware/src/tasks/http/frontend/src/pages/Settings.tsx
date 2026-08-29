@@ -10,6 +10,8 @@ type Settings = {
 		m: number;
 		threshold: number;
 	};
+	spoolman_host?: string;
+	spoolman_port?: number;
 };
 
 function round(value: number, decimals = 6) {
@@ -28,6 +30,7 @@ export function SettingsPage({ setPage }: { setPage: (page: Pages) => void }) {
 			m: 1,
 			threshold: 0.9,
 		},
+		spoolman_host: undefined,
 	});
 
 	useEffect(() => {
@@ -48,6 +51,12 @@ export function SettingsPage({ setPage }: { setPage: (page: Pages) => void }) {
 							m: round(data.algo.m),
 							threshold: round(data.algo.threshold, 3),
 						},
+						spoolman_host: !data.spoolman_host
+							? ""
+							: data.spoolman_host,
+						spoolman_port: !data.spoolman_port
+							? 0
+							: data.spoolman_port,
 					});
 				}
 			} catch (err) {
@@ -62,12 +71,34 @@ export function SettingsPage({ setPage }: { setPage: (page: Pages) => void }) {
 		};
 	}, []);
 
+	function updateSpoolmanValidity() {
+		const ip = document.getElementById("spoolman_ip") as HTMLInputElement;
+		const port = document.getElementById(
+			"spoolman_port",
+		) as HTMLInputElement;
+
+		const ipSet = ip.value !== "";
+		const portSet = port.value !== "";
+
+		if (ipSet !== portSet) {
+			const message =
+				"IP and port must either both be set or both be empty";
+			port.setCustomValidity(message);
+		} else {
+			port.setCustomValidity(
+				/^(?:\d{2,}).?$/.test(port.value) ? "" : "Not matching format",
+			);
+		}
+	}
+
 	function updateValidity(e: Event) {
+		updateSpoolmanValidity();
+
 		const form = e.currentTarget as HTMLFormElement;
 		setIsValid(form.checkValidity());
 	}
 
-	function updateField(path: string[], value: number) {
+	function updateField<T>(path: string[], value: T) {
 		setSettings((prev) => {
 			const copy = structuredClone(prev);
 
@@ -91,6 +122,14 @@ export function SettingsPage({ setPage }: { setPage: (page: Pages) => void }) {
 				m: round(settings.algo.m),
 				threshold: round(settings.algo.threshold, 6),
 			},
+			spoolman_host:
+				!settings.spoolman_host || settings.spoolman_host === "" // empty or undefined/null
+					? undefined
+					: settings.spoolman_host,
+			spoolman_port:
+				!settings.spoolman_port || settings.spoolman_port === 0
+					? undefined
+					: settings.spoolman_port,
 		};
 
 		await fetch("/config/settings", {
@@ -183,6 +222,50 @@ export function SettingsPage({ setPage }: { setPage: (page: Pages) => void }) {
 								Number((e.target as HTMLInputElement).value),
 							)
 						}
+						class="p-2 rounded shadow-lg invalid:border-red-400"
+					/>
+				</div>
+
+				{/* Spoolman URL */}
+				<div class="flex flex-col mx-auto lg:w-2/3 w-full">
+					<label htmlFor="spoolman_ip">Spoolman IP</label>
+					<input
+						id="spoolman_ip"
+						type="text"
+						value={settings.spoolman_host}
+						onInput={(e) => {
+							updateField(
+								["spoolman_host"],
+								(e.target as HTMLInputElement).value.replace(
+									/[^0-9.]/g,
+									"",
+								),
+							);
+						}}
+						class="p-2 rounded shadow-lg invalid:border-red-400"
+					/>
+				</div>
+
+				{/* Spoolman Port */}
+				<div class="flex flex-col mx-auto lg:w-2/3 w-full">
+					<label htmlFor="spoolman_port">Spoolman Port</label>
+					<input
+						id="spoolman_port"
+						type="text"
+						value={
+							settings.spoolman_port
+								? settings.spoolman_port.toString()
+								: ""
+						}
+						onInput={(e) => {
+							let val = (e.target as HTMLInputElement).value
+								.replace(/[^0-9]/g, "")
+								.slice(0, 5);
+							updateField(
+								["spoolman_port"],
+								val === "" ? undefined : Number(val),
+							);
+						}}
 						class="p-2 rounded shadow-lg invalid:border-red-400"
 					/>
 				</div>
