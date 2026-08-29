@@ -269,7 +269,17 @@ export function SettingsPage({ setPage }: { setPage: (page: Pages) => void }) {
 						class="p-2 rounded shadow-lg invalid:border-red-400"
 					/>
 				</div>
-
+				<p class="text-white mx-auto lg:w-2/3 w-full text-center -my-2">
+					Note:
+					<br />
+					The Spoolman integration only supports http (unencrypted)
+					traffic.
+					<br />
+					Only IP addresses are allowed.
+					<br />
+					You have to add a custom field of type <b>float</b> under
+					Settings-Extra Fields-Filaments. The key must be <b>td</b>.
+				</p>
 				<div class="lg:w-2/3 w-full mx-auto">
 					<Button type="submit" disabled={!isValid}>
 						Save
