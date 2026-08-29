@@ -98,7 +98,7 @@ pub async fn is_filament_inserted<'d>(
     }
     detection_readings.sort_by(|a, b| a.partial_cmp(b).unwrap());
     let median_reading = detection_readings[1]; // Middle value (median of 3)
-    
+
     /*
        let mean = detection_readings.iter().sum::<f32>() / 3.0;
        let variance = detection_readings
