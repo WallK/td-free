@@ -11,7 +11,7 @@ export function DashboardPage({ setPage }: { setPage: (page: Pages) => void }) {
 			? null
 			: {
 					td: "1.4",
-					hex_color: "FF0000",
+					hex_color: "FFFFAC",
 					buf_count: 21,
 				},
 	);
