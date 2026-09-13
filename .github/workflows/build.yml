@@ -92,6 +92,7 @@ jobs:
       - name: Build | Compile (production)
         run: |
           export VERSION=${BRANCH}@${SHA_SHORT}
+          export DEFMT_LOG=error
           cargo build -p firmware --release
         env:
           BRANCH: ${{ env.branch }}
@@ -113,7 +114,6 @@ jobs:
       - name: Build | Compile (debug)
         run: |
           export VERSION=${BRANCH}@${SHA_SHORT}
-          export DEFMT_LOG=error
           cargo build -p firmware --release
         env:
           BRANCH: ${{ env.branch }}
